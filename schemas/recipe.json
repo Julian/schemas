@@ -1,0 +1,69 @@
+{
+  "title": "Recipe",
+  "description": "Some prepared edible thing I have made or intend to make.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "$id": "tag:julian.github.io,2024:schemas:recipe",
+
+  "type": "object",
+  "required": ["name"],
+
+  "properties": {
+    "name": {
+      "description": "The name or short description of what we're cookin'.",
+      "type": "string"
+    },
+
+    "ingredients": {
+      "description": "Key ingredients central to any version of the recipe.",
+
+      "type": "array",
+      "uniqueItems": true,
+
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+
+    "links": {
+      "description": "Known links for preparing this recipe.",
+
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+
+    "variations": {
+      "description": "A twist or addition to make on the recipe.",
+
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "notes": { "$ref": "#notes" }
+        }
+      }
+    },
+
+    "notes": {
+      "$anchor": "notes",
+      "description": "Any notes gathered from having prepared the recipe.",
+      "type": "string"
+    },
+
+    "tags": {
+      "description": "A set of arbitrary tags to associate with the recipe.",
+
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+
+      "items": { "type": "string" }
+    }
+  }
+}
