@@ -1,0 +1,66 @@
+{
+  "title": "Podcast",
+  "description": "A podcast I am subscribed to, and hopefully like.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "$id": "tag:julian.github.io,2024:schemas:podcast",
+
+  "type": "object",
+  "required": ["name"],
+
+  "properties": {
+    "name": {
+      "description": "The name of the podcast, which may be slightly truncated or modified if it contains more than just its clear title.",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "url": {
+      "description": "The real-user-targeted homepage for the podcast (as opposed to its feed URLs).",
+      "type": "string",
+      "minLength": 1,
+      "format": "url"
+    },
+
+    "rss": {
+      "description": "The RSS feed URL for this podcast.",
+      "type": "string",
+      "minLength": 1,
+      "format": "url"
+    },
+
+    "starred": {
+      "description": "Episodes which I have starred as favorites.",
+
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+
+      "items": { "$ref": "#episode" }
+    },
+
+    "tags": {
+      "description": "A set of arbitrary tags to associate with the podcast.",
+
+      "type": "array",
+      "uniqueItems": true,
+      "default": [],
+
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+
+  "$defs": {
+    "episode": {
+      "$anchor": "episode",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The episode title",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
