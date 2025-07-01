@@ -1,0 +1,356 @@
+{
+  "title": "Note Frontmatter",
+  "description": "A schema for the frontmatter of (non-daily) notes in my vault.",
+
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "$todo": [
+    "require importance",
+    "auto-calculate importance via gwern-resorter",
+    "validate a desired tag order, though obsidian.nvim does silly things seemingly",
+
+    "extract out cross-schema primitives like flexible-date",
+    "re-integrate (and host?) for obsidiana use"
+  ],
+
+  "$id": "tag:vault.grayvines.com,2024:note",
+
+  "type": "object",
+
+  "unevaluatedProperties": false,
+  "required": ["id", "tags", "status"],
+  "properties": {
+    "id": {
+      "description": "the Obsidian ID of the note",
+      "type": "string"
+    },
+    "aliases": {
+      "description": "Alias IDs of the note",
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "description": "Arbitrary metadata tags of the note",
+      "type": "array",
+      "items": { "$ref": "#tag" }
+    },
+
+    "due": {
+      "description": "a date when the note should be finished or acted upon",
+      "type": "string"
+    },
+    "recur": {
+      "description": "a date when the note should be revisited or acted upon again",
+      "$ref": "#flexible-date-or-month"
+    },
+
+    "importance": {
+      "description": "a number from 1 to 10 estimating how important the note is",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "status": {
+      "description": "an estimate of how finished the note is",
+
+      "oneOf": [
+        {
+          "const": "transient",
+          "description": "the note has no finished state, contents come and go within it"
+        },
+        {
+          "const": "finished",
+          "description": "unless I learn new information, the note should be in its final state"
+        },
+        {
+          "const": "organizing",
+          "description": "the note contains all information needed, and I have begun structuring it in an ordered way"
+        },
+        {
+          "const": "notes",
+          "description": "I am still collecting information needed to flesh out the note's contents"
+        },
+        {
+          "const": "empty",
+          "description": "the note has no contents and essentially is thusfar used for interlinking"
+        },
+        {
+          "const": "trial",
+          "description": "I'm not convinced I'll even keep the note, I'll have to see whether it's useful"
+        }
+      ]
+    },
+
+    "medium": {
+      "description": "the medium which the subject of the note is in",
+      "enum": [ "book", "podcast", "paper", "video", "audio", "article" ]
+    },
+
+    "url": {
+      "description": "a URL where the subject of the note lives",
+      "type": "string",
+      "format": "uri"
+    },
+
+    "authors": {
+      "description": "the authors of the note subject",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+    "published": {
+      "description": "the date(time) when the note subject was published",
+      "$ref": "#flexible-date"
+    }
+  },
+
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "tags": {
+            "not": { "contains": { "const": "index" } },
+            "contains": { "const": "bookmarks" }
+          }
+        }
+      },
+      "then": { "$ref": "#bookmark" }
+    },
+    {
+      "if": { "required" : [ "medium" ] },
+      "then": {
+        "properties": {
+          "homepage": { "$comment": "is there a jsonschema bug here?" },
+          "medium": {
+            "allOf": [
+              { "if": { "const": "book" }, "then": { "$ref": "#book" } },
+              { "if": { "const": "paper" }, "then": { "$ref": "#paper" } },
+              { "if": { "const": "podcast" }, "then": { "$ref": "#podcast" } },
+              { "if": { "const": "video" }, "then": { "$ref": "#video" } }
+            ]
+          }
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+    "flexible-date": {
+      "description": "A date which can be a full date, a year and month, or just a year.",
+
+      "$anchor": "flexible-date",
+
+      "anyOf": [
+        { "format": "date-time" },
+        { "format": "date" },
+        {
+          "description": "Year and month, with no specific day.",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+        }
+      ]
+    },
+    "flexible-date-or-month": {
+      "description": "Like flexible-date, but also allow just a month number.",
+
+      "$anchor": "flexible-date-or-month",
+
+      "anyOf": [
+        { "$ref": "#flexible-date" },
+        { "type": "integer", "minimum": 1, "maximum": 12 },
+        {
+          "description": "A month string, from 1 to 12.",
+          "type": "string",
+          "pattern": "^(0?[1-9]|1[0-2])$"
+        }
+      ]
+    },
+    "tag": {
+      "description": "A note tag.",
+      "$anchor": "tag",
+
+      "type": "string",
+
+      "oneOf": [
+        {
+          "const": "index",
+          "description": "an index of other notes"
+        },
+
+        {
+          "const": "public",
+          "description": "a note which I make public on my blog"
+        },
+
+        {
+          "const": "todo",
+          "description": "contains a follow-up action"
+        },
+        {
+          "const": "todo/now",
+          "description": "contains a follow-up action which is imminently due"
+        },
+        {
+          "const": "todo/recategorize",
+          "description": "a note whose contents should be reorganized elsewhere in the vault"
+        },
+
+        {
+          "const": "bookmarks",
+          "description": "contains lists of links I am saving"
+        },
+        {
+          "const": "learn",
+          "description": "contains something I want to learn or learn more about"
+        },
+        {
+          "const": "learn/anki",
+          "description": "notes which should be transformed into Anki decks"
+        },
+        {
+          "const": "opinion",
+          "description": "contains opinion(s) on a specific topic or piece of content"
+        },
+        {
+          "const": "tidbit",
+          "description": "a small self contained fact or piece of trivia"
+        },
+
+        {
+          "const": "advice",
+          "description": "contains advice for a particular situation"
+        },
+        {
+          "const": "house",
+          "description": "relates to my current or future house in some way"
+        },
+        {
+          "const": "finances",
+          "description": "relates to my personal finances"
+        },
+        {
+          "const": "relationships",
+          "description": "relates to interpersonal relationships"
+        },
+        {
+          "const": "shopping",
+          "description": "relates to future purchases"
+        },
+        {
+          "const": "software",
+          "description": "relates to my use of specific pieces of software"
+        },
+        {
+          "const": "teaching",
+          "description": "relates to teaching or professorship"
+        },
+
+        {
+          "enum": [
+            "entertainment",
+            "entertainment/games",
+            "entertainment/games/chess",
+
+            "food",
+            "food/alcohol",
+            "food/bread",
+            "food/coffee",
+            "food/pasta",
+            "food/recipes",
+
+            "ai",
+            "art",
+            "behavioral economics",
+            "design",
+            "diy",
+            "health",
+            "insurance",
+            "language",
+            "law",
+            "linguistics",
+            "math",
+            "management",
+            "medicine",
+            "music",
+            "photography",
+            "politics",
+            "productivity",
+            "security",
+            "science",
+            "travel",
+
+            "programming",
+            "programming/performance",
+            "programming/ux",
+            "programming/web",
+            "programming/web/accessibility",
+
+            "lean",
+            "neovim",
+
+            "español",
+            "italiano",
+
+            "nyc",
+
+            "papers",
+            "projects",
+            "reading",
+            "writing",
+
+            "work",
+            "work/pdl"
+          ]
+        }
+      ]
+    },
+
+    "bookmark": {
+      "description": "A note which represents a bookmarked site I have read.",
+      "$anchor": "bookmark",
+
+      "required": ["url"]
+    },
+
+    "book": {
+      "description": "A note which represents a book I have read.",
+      "$anchor": "book",
+
+      "medium": { "const": "book" },
+
+      "required": ["authors", "published", "medium"]
+    },
+
+    "paper": {
+      "description": "A note which represents a paper or article I have read.",
+      "$anchor": "paper",
+
+      "medium": { "const": "paper" },
+
+      "required": ["authors", "published", "medium"]
+    },
+
+    "podcast": {
+      "description": "A note which represents a podcast.",
+      "$anchor": "podcast",
+
+      "medium": { "const": "podcast" },
+
+      "required": [ "homepage", "medium" ],
+      "properties": {
+        "homepage": {
+          "description": "The human-browseable homepage for this podcast.",
+          "format": "uri"
+        }
+      }
+    },
+
+    "video": {
+      "description": "A note which represents a video I have watched.",
+      "$anchor": "video",
+
+      "medium": { "const": "video" },
+
+      "required": ["published", "medium"]
+    }
+  }
+}
