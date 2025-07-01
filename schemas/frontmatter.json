@@ -83,7 +83,7 @@
 
     "medium": {
       "description": "the medium which the subject of the note is in",
-      "enum": [ "book", "podcast", "paper", "video", "audio", "article" ]
+      "enum": ["book", "podcast", "paper", "video", "audio", "article"]
     },
 
     "url": {
@@ -117,7 +117,7 @@
       "then": { "$ref": "#bookmark" }
     },
     {
-      "if": { "required" : [ "medium" ] },
+      "if": { "required": ["medium"] },
       "then": {
         "properties": {
           "homepage": { "$comment": "is there a jsonschema bug here?" },
@@ -335,7 +335,7 @@
 
       "medium": { "const": "podcast" },
 
-      "required": [ "homepage", "medium" ],
+      "required": ["homepage", "medium"],
       "properties": {
         "homepage": {
           "description": "The human-browseable homepage for this podcast.",
