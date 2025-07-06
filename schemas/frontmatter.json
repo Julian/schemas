@@ -101,6 +101,19 @@
     "published": {
       "description": "the date(time) when the note subject was published",
       "$ref": "#flexible-date"
+    },
+
+    "anki": {
+      "description": "Anki metadata for including the note in a deck.",
+      "type": "object",
+      "properties": {
+        "deck": {
+          "description": "The Anki deck this note belongs to.",
+          "type": "string",
+          "enum": [ "Law", "Papers" ]
+        }
+      },
+      "additionalProperties": false
     }
   },
 
@@ -201,10 +214,6 @@
         {
           "const": "learn",
           "description": "contains something I want to learn or learn more about"
-        },
-        {
-          "const": "learn/anki",
-          "description": "notes which should be transformed into Anki decks"
         },
         {
           "const": "opinion",
