@@ -37,7 +37,13 @@
 
     "due": {
       "description": "a date when the note should be finished or acted upon",
-      "type": "string"
+      "oneOf": [
+        { "$ref": "#flexible-date-or-month" },
+        {
+          "description": "a special value indicating the note is due imminently",
+          "const": "now"
+        }
+      ]
     },
     "recur": {
       "description": "a date when the note should be revisited or acted upon again",
@@ -110,7 +116,7 @@
         "deck": {
           "description": "The Anki deck this note belongs to.",
           "type": "string",
-          "enum": [ "Law", "Papers" ]
+          "enum": ["Law", "Papers"]
         }
       },
       "additionalProperties": false
@@ -153,11 +159,13 @@
 
       "$anchor": "flexible-date",
 
-      "anyOf": [
-        { "format": "date-time" },
-        { "format": "date" },
+      "oneOf": [
+        { "$ref": "#datetime-object" },
+        { "type": "string", "format": "date-time" },
+        { "type": "string", "format": "date" },
         {
           "description": "Year and month, with no specific day.",
+          "type": "string",
           "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
         }
       ]
@@ -167,7 +175,7 @@
 
       "$anchor": "flexible-date-or-month",
 
-      "anyOf": [
+      "oneOf": [
         { "$ref": "#flexible-date" },
         { "type": "integer", "minimum": 1, "maximum": 12 },
         {
@@ -176,6 +184,21 @@
           "pattern": "^(0?[1-9]|1[0-2])$"
         }
       ]
+    },
+    "datetime-object": {
+      "description": "a funny hack to represent Python datetime objects",
+      "$anchor": "datetime-object",
+      "not": {
+        "type": [
+          "array",
+          "boolean",
+          "integer",
+          "null",
+          "number",
+          "object",
+          "string"
+        ]
+      }
     },
     "tag": {
       "description": "A note tag.",
@@ -197,10 +220,6 @@
         {
           "const": "todo",
           "description": "contains a follow-up action"
-        },
-        {
-          "const": "todo/now",
-          "description": "contains a follow-up action which is imminently due"
         },
         {
           "const": "todo/recategorize",
