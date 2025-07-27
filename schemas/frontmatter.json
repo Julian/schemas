@@ -18,7 +18,11 @@
   "type": "object",
 
   "unevaluatedProperties": false,
-  "required": ["id", "tags", "status"],
+  "required": [
+    "id",
+    "tags",
+    "status"
+  ],
   "properties": {
     "id": {
       "description": "the Obsidian ID of the note",
@@ -26,7 +30,7 @@
     },
     "aliases": {
       "description": "Alias IDs of the note",
-      "type": ["array", "null"],
+      "type": [ "array", "null" ],
       "items": { "type": "string" }
     },
     "tags": {
@@ -86,10 +90,16 @@
         }
       ]
     },
-
     "medium": {
       "description": "the medium which the subject of the note is in",
-      "enum": ["book", "podcast", "paper", "video", "audio", "article"]
+      "enum": [
+        "book",
+        "podcast",
+        "paper",
+        "video",
+        "audio",
+        "article"
+      ]
     },
 
     "url": {
@@ -116,7 +126,10 @@
         "deck": {
           "description": "The Anki deck this note belongs to.",
           "type": "string",
-          "enum": ["Law", "Papers"]
+          "enum": [
+            "Law",
+            "Papers"
+          ]
         }
       },
       "additionalProperties": false
@@ -136,10 +149,11 @@
       "then": { "$ref": "#bookmark" }
     },
     {
-      "if": { "required": ["medium"] },
+      "if": { "required": [ "medium" ] },
       "then": {
         "properties": {
           "homepage": { "$comment": "is there a jsonschema bug here?" },
+          "isbn": { "$comment": "is there a jsonschema bug here?" },
           "medium": {
             "allOf": [
               { "if": { "const": "book" }, "then": { "$ref": "#book" } },
@@ -273,6 +287,11 @@
         },
 
         {
+          "const": "prompt",
+          "description": "a note with LLM prompt information"
+        },
+
+        {
           "enum": [
             "entertainment",
             "entertainment/games",
@@ -334,36 +353,48 @@
 
     "bookmark": {
       "description": "A note which represents a bookmarked site I have read.",
+
       "$anchor": "bookmark",
 
-      "required": ["url"]
+      "required": [ "url" ]
     },
-
     "book": {
       "description": "A note which represents a book I have read.",
+
       "$anchor": "book",
 
+      "properties": {
+        "isbn": {
+          "$todo": [ "some external ISBN format" ],
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+
       "medium": { "const": "book" },
-
-      "required": ["authors", "published", "medium"]
+      "required": [
+        "authors",
+        "isbn",
+        "published",
+        "medium"
+      ]
     },
-
     "paper": {
       "description": "A note which represents a paper or article I have read.",
+
       "$anchor": "paper",
 
       "medium": { "const": "paper" },
-
-      "required": ["authors", "published", "medium"]
+      "required": [ "authors", "published", "medium" ]
     },
 
     "podcast": {
       "description": "A note which represents a podcast.",
+
       "$anchor": "podcast",
 
       "medium": { "const": "podcast" },
-
-      "required": ["homepage", "medium"],
+      "required": [ "homepage", "medium" ],
       "properties": {
         "homepage": {
           "description": "The human-browseable homepage for this podcast.",
@@ -371,14 +402,13 @@
         }
       }
     },
-
     "video": {
       "description": "A note which represents a video I have watched.",
+
       "$anchor": "video",
 
       "medium": { "const": "video" },
-
-      "required": ["published", "medium"]
+      "required": [ "published", "medium" ]
     }
   }
 }
