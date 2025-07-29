@@ -20,8 +20,7 @@
   "unevaluatedProperties": false,
   "required": [
     "id",
-    "tags",
-    "status"
+    "tags"
   ],
   "properties": {
     "id": {
@@ -63,6 +62,8 @@
     "status": {
       "description": "an estimate of how finished the note is",
 
+      "default": "empty",
+
       "oneOf": [
         {
           "const": "transient",
@@ -94,11 +95,11 @@
       "description": "the medium which the subject of the note is in",
       "enum": [
         "book",
+        "short story",
         "podcast",
         "paper",
         "video",
-        "audio",
-        "article"
+        "audio"
       ]
     },
 
@@ -106,6 +107,15 @@
       "description": "a URL where the subject of the note lives",
       "type": "string",
       "format": "uri"
+    },
+
+    "links": {
+      "description": "URLs relevant to the note but not 'canonical'. For example, a place where content relevant to the note might be viewed but which is not a canonical hosted version of it.",
+      "type": "object",
+      "unevaluatedProperties": {
+        "type" : "string",
+        "format": "uri"
+      }
     },
 
     "authors": {
@@ -169,7 +179,7 @@
 
   "$defs": {
     "flexible-date": {
-      "description": "A date which can be a full date, a year and month, or just a year.",
+      "description": "A date which can be a full date, or a year and month.",
 
       "$anchor": "flexible-date",
 
@@ -312,7 +322,6 @@
             "health",
             "insurance",
             "language",
-            "law",
             "linguistics",
             "math",
             "management",
@@ -321,12 +330,20 @@
             "photography",
             "politics",
             "productivity",
+            "psychology",
             "security",
             "science",
             "travel",
 
+            "law",
+            "law/copyright",
+
+            "literature",
+            "literature/fiction",
+
             "programming",
             "programming/performance",
+            "programming/systems",
             "programming/ux",
             "programming/web",
             "programming/web/accessibility",
@@ -375,6 +392,18 @@
       "required": [
         "authors",
         "isbn",
+        "published",
+        "medium"
+      ]
+    },
+    "short story": {
+      "description": "A note which represents a short story I have read.",
+
+      "$anchor": "short-story",
+
+      "medium": { "const": "short story" },
+      "required": [
+        "authors",
         "published",
         "medium"
       ]
